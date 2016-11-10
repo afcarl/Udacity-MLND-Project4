@@ -48,8 +48,8 @@ class LearningAgent(Agent):
             self.alpha = 0
         else:
 #             self.epsilon = math.pow(self.p, self.trial_num)
-            self.epsilon -= 0.003
-#             self.epsilon = 1/math.pow(self.trial_num, 2)
+#             self.epsilon -= 0.005
+            self.epsilon = 1/math.pow(self.trial_num, 2)
             self.trial_num += 1
 
         return None
@@ -73,8 +73,20 @@ class LearningAgent(Agent):
         #   For each action, set the Q-value for the state-action pair to 0
         
         # define states
-        state = (waypoint, inputs['light'], inputs['oncoming'], inputs['left'])
-
+        state = ''
+        if inputs['light'] == 'green':
+            # if green light, we only care about the oncoming traffic. We can ignore others. 
+            state = ('green', inputs['oncoming'])
+        else:
+            # if red light, we only care about left car moving forward. We can ignore others. 
+            if inputs['left'] == 'forward':
+                state = ('red', 'left_forward')
+            else: 
+                state = ('red', 'else')
+        
+        # combine with the waypoint
+        state = (waypoint,) + state
+        
         return state
 
 
@@ -107,7 +119,7 @@ class LearningAgent(Agent):
         if state not in self.Q:
             self.Q[state] = dict()
             for action in self.valid_actions:
-                self.Q[state][action] = 0.0
+                self.Q[state][action] = 1.5
 
         return
 
@@ -151,7 +163,7 @@ class LearningAgent(Agent):
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
         self.Q[state][action] = \
-            (1-self.alpha) * self.Q[state][action] + self.alpha * (reward + self.get_maxQ(state))  
+            (1-self.alpha) * self.Q[state][action] + self.alpha * ((reward-1) + self.get_maxQ(state))  
 
         return
 
@@ -166,6 +178,8 @@ class LearningAgent(Agent):
         action = self.choose_action(state)  # Choose an action
         reward = self.env.act(self, action) # Receive a reward
         self.learn(state, action, reward)   # Q-learn
+        
+        print self.Q
 
         return
         
@@ -203,14 +217,14 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env, update_delay=0.001, display = True, log_metrics=True, optimized=True)
+    sim = Simulator(env, update_delay=0.0001, display = True, log_metrics=True, optimized=True)
     
     ##############
     # Run the simulator
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(tolerance=0.001, n_test=50)
+    sim.run(tolerance=0.0005, n_test=20)
 
 
 if __name__ == '__main__':
