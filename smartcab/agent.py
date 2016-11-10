@@ -162,8 +162,13 @@ class LearningAgent(Agent):
         ###########
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
+        
+        # Subtract 1 from reward to punish agent for not following waypoint
+        reward = reward -1
+        
+        # update rule  
         self.Q[state][action] = \
-            (1-self.alpha) * self.Q[state][action] + self.alpha * ((reward-1) + self.get_maxQ(state))  
+            (1-self.alpha) * self.Q[state][action] + self.alpha * (reward + self.get_maxQ(state))  
 
         return
 
@@ -178,8 +183,6 @@ class LearningAgent(Agent):
         action = self.choose_action(state)  # Choose an action
         reward = self.env.act(self, action) # Receive a reward
         self.learn(state, action, reward)   # Q-learn
-        
-        print self.Q
 
         return
         
