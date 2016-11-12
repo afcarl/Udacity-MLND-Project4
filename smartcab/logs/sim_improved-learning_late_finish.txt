@@ -1,0 +1,112 @@
+/-----------------------------------------
+| State-action rewards from Q-Learning
+\-----------------------------------------
+
+('forward', 'red', 'else')
+ -- forward : 250.86
+ -- right : 272.92
+ -- None : 302.13
+ -- left : 253.30
+
+('forward', 'red', 'left_forward')
+ -- forward : -2.15
+ -- right : 19.34
+ -- None : 53.94
+ -- left : -4.67
+
+('left', 'green', 'left')
+ -- forward : 63.95
+ -- right : 62.11
+ -- None : 48.50
+ -- left : 72.14
+
+('right', 'green', 'right')
+ -- forward : 13.56
+ -- right : 20.40
+ -- None : 1.95
+ -- left : -5.08
+
+('left', 'red', 'else')
+ -- forward : 224.22
+ -- right : 250.06
+ -- None : 274.55
+ -- left : 226.78
+
+('right', 'green', 'forward')
+ -- forward : 34.89
+ -- right : 44.03
+ -- None : 27.60
+ -- left : 12.36
+
+('right', 'red', 'else')
+ -- forward : 220.43
+ -- right : 232.00
+ -- None : 256.87
+ -- left : 212.06
+
+('left', 'green', 'forward')
+ -- forward : 15.55
+ -- right : 8.47
+ -- None : 2.73
+ -- left : -10.40
+
+('forward', 'green', 'right')
+ -- forward : 20.07
+ -- right : 13.88
+ -- None : 10.07
+ -- left : -6.81
+
+('left', 'green', None)
+ -- forward : 127.60
+ -- right : 131.99
+ -- None : 122.61
+ -- left : 142.03
+
+('forward', 'green', 'forward')
+ -- forward : 47.63
+ -- right : 34.42
+ -- None : 26.77
+ -- left : 13.96
+
+('right', 'green', None)
+ -- forward : 129.20
+ -- right : 146.14
+ -- None : 128.92
+ -- left : 125.86
+
+('forward', 'green', None)
+ -- forward : 190.37
+ -- right : 158.16
+ -- None : 149.75
+ -- left : 164.05
+
+('left', 'red', 'left_forward')
+ -- forward : -9.22
+ -- right : 7.48
+ -- None : 34.52
+ -- left : -18.99
+
+('forward', 'green', 'left')
+ -- forward : 94.00
+ -- right : 70.22
+ -- None : 57.62
+ -- left : 78.07
+
+('left', 'green', 'right')
+ -- forward : 8.03
+ -- right : 3.40
+ -- None : -1.10
+ -- left : -16.46
+
+('right', 'red', 'left_forward')
+ -- forward : -13.76
+ -- right : -4.23
+ -- None : 35.59
+ -- left : -19.33
+
+('right', 'green', 'left')
+ -- forward : 33.09
+ -- right : 53.07
+ -- None : 36.00
+ -- left : 43.21
+

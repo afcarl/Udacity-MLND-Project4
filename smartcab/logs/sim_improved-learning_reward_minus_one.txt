@@ -1,0 +1,112 @@
+/-----------------------------------------
+| State-action rewards from Q-Learning
+\-----------------------------------------
+
+('forward', 'red', 'else')
+ -- forward : -9.00
+ -- right : 1.06
+ -- None : 14.73
+ -- left : -11.74
+
+('forward', 'red', 'left_forward')
+ -- forward : -2.61
+ -- right : -3.38
+ -- None : 2.56
+ -- left : -1.34
+
+('left', 'green', 'left')
+ -- forward : -0.02
+ -- right : -0.20
+ -- None : -0.72
+ -- left : 2.62
+
+('right', 'green', 'right')
+ -- forward : -0.05
+ -- right : 0.34
+ -- None : 0.00
+ -- left : 0.00
+
+('left', 'red', 'else')
+ -- forward : -5.75
+ -- right : 4.54
+ -- None : 12.96
+ -- left : -16.76
+
+('right', 'green', 'forward')
+ -- forward : 0.05
+ -- right : 1.60
+ -- None : -1.05
+ -- left : -0.01
+
+('right', 'red', 'else')
+ -- forward : -9.92
+ -- right : 5.19
+ -- None : 3.76
+ -- left : -9.44
+
+('left', 'green', 'forward')
+ -- forward : -0.95
+ -- right : -1.97
+ -- None : -4.55
+ -- left : -4.26
+
+('forward', 'green', 'right')
+ -- forward : 0.76
+ -- right : -0.01
+ -- None : 0.00
+ -- left : -5.20
+
+('left', 'green', None)
+ -- forward : 0.77
+ -- right : -0.05
+ -- None : -4.44
+ -- left : 7.31
+
+('forward', 'green', 'forward')
+ -- forward : 3.14
+ -- right : 0.19
+ -- None : 0.00
+ -- left : 0.00
+
+('right', 'green', None)
+ -- forward : 2.94
+ -- right : 6.22
+ -- None : -2.85
+ -- left : 1.74
+
+('forward', 'green', None)
+ -- forward : 9.04
+ -- right : 0.15
+ -- None : -2.99
+ -- left : -0.05
+
+('left', 'red', 'left_forward')
+ -- forward : -25.38
+ -- right : -9.00
+ -- None : 1.25
+ -- left : -5.27
+
+('forward', 'green', 'left')
+ -- forward : 5.77
+ -- right : 0.08
+ -- None : -0.02
+ -- left : 0.30
+
+('left', 'green', 'right')
+ -- forward : -0.54
+ -- right : -0.28
+ -- None : -2.70
+ -- left : -1.58
+
+('right', 'red', 'left_forward')
+ -- forward : -12.01
+ -- right : -7.84
+ -- None : 0.90
+ -- left : -23.13
+
+('right', 'green', 'left')
+ -- forward : -0.91
+ -- right : 0.16
+ -- None : -0.02
+ -- left : 0.00
+
