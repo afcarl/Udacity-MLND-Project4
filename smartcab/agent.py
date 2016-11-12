@@ -9,7 +9,7 @@ class LearningAgent(Agent):
     """ An agent that learns to drive in the Smartcab world.
         This is the object you will be modifying. """ 
 
-    def __init__(self, env, learning=False, epsilon=1.0, alpha=0.5):
+    def __init__(self, env, learning=False, epsilon=11.0, alpha=0.5):
         super(LearningAgent, self).__init__(env)     # Set the agent in the evironment 
         self.planner = RoutePlanner(self.env, self)  # Create a route planner
         self.valid_actions = self.env.valid_actions  # The set of valid actions
@@ -24,8 +24,15 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Set any additional class parameters as needed
-        self.trial_num = 1
-        self.p = 0.9
+        # Current trial number. 
+        self.trial_num = 1      
+        # Initial deadline for the trial 
+        self.initial_deadline = 1.0
+        # Initial epsilon user input for the trial
+        self.initial_epsilon = epsilon
+        # Initial alpha user input for the trial
+        self.initial_alpha = alpha
+        
 
 
     def reset(self, destination=None, testing=False):
@@ -43,14 +50,26 @@ class LearningAgent(Agent):
         # Update additional class parameters as needed
         # If 'testing' is True, set epsilon and alpha to 0
         
+        
         if testing:
             self.epsilon = 0
             self.alpha = 0
         else:
-#             self.epsilon = math.pow(self.p, self.trial_num)
-#             self.epsilon -= 0.005
-            self.epsilon = 1/math.pow(self.trial_num, 2)
+            if self.trial_num > 800:
+                # if training diverges, stop training. 
+                self.epsilon = 0.0
+            elif self.env.success:
+                # if previous trial was success, reduce the epsilon
+                self.epsilon -= 0.1 * self.epsilon
+            else:
+                # if previous trial was failure, start exploration more. 
+                self.epsilon = self.initial_epsilon
+            
+            # track the trial number for the case trial diverges. 
             self.trial_num += 1
+        
+        
+        
 
         return None
 
@@ -119,7 +138,7 @@ class LearningAgent(Agent):
         if state not in self.Q:
             self.Q[state] = dict()
             for action in self.valid_actions:
-                self.Q[state][action] = 1.5
+                self.Q[state][action] = 0
 
         return
 
@@ -131,6 +150,7 @@ class LearningAgent(Agent):
         # Set the agent state and default action
         self.state = state
         self.next_waypoint = self.planner.next_waypoint()
+        
         
 
         ########### 
@@ -144,6 +164,7 @@ class LearningAgent(Agent):
             action = random.choice(self.valid_actions)
         else:
             if random.random() < self.epsilon:
+                # for epsilon possibility, explore. 
                 action = random.choice(self.valid_actions)
             else:
                 action = max(self.Q[state], key=self.Q[state].get)
@@ -164,11 +185,20 @@ class LearningAgent(Agent):
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
         
         # Subtract 1 from reward to punish agent for not following waypoint
-        reward = reward -1
+#         reward = reward -1
+        if self.env.t == 0:
+            # set the initial_deadline for the trial 
+            self.initial_deadline = float(self.env.get_deadline(self))
+            
+        self.alpha = 0.8 * float(self.env.t+1)**2 / self.initial_deadline**2
+        
+        
         
         # update rule  
         self.Q[state][action] = \
             (1-self.alpha) * self.Q[state][action] + self.alpha * (reward + self.get_maxQ(state))  
+            
+        
 
         return
 
@@ -205,7 +235,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent, learning=True, alpha = 0.5)
+    agent = env.create_agent(LearningAgent, learning=True, alpha = 0.8, epsilon = 0.5)
     
     ##############
     # Follow the driving agent
@@ -220,14 +250,14 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env, update_delay=0.0001, display = True, log_metrics=True, optimized=True)
+    sim = Simulator(env, update_delay=0.001, display = False, log_metrics=True, optimized=True)
     
     ##############
     # Run the simulator
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(tolerance=0.0005, n_test=20)
+    sim.run(tolerance=0.01, n_test=30)
 
 
 if __name__ == '__main__':
