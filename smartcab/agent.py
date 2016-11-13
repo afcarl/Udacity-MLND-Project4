@@ -24,14 +24,10 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Set any additional class parameters as needed
-        # Current trial number. 
-        self.trial_num = 1      
-        # Initial deadline for the trial 
-        self.initial_deadline = 1.0
-        # Initial epsilon user input for the trial
-        self.initial_epsilon = epsilon
-        # Initial alpha user input for the trial
-        self.initial_alpha = alpha
+        # Track the number of total Q-value based steps.
+        self.q_steps = 0
+        # Track the number of total random steps.
+        self.random_steps = 0
         
 
 
@@ -55,22 +51,8 @@ class LearningAgent(Agent):
             self.epsilon = 0
             self.alpha = 0
         else:
-            if self.trial_num > 800:
-                # if training diverges, stop training. 
-                self.epsilon = 0.0
-            elif self.env.success:
-                # if previous trial was success, reduce the epsilon
-                self.epsilon -= 0.1 * self.epsilon
-            else:
-                # if previous trial was failure, start exploration more. 
-                self.epsilon = self.initial_epsilon
+            self.epsilon -= 0.00084
             
-            # track the trial number for the case trial diverges. 
-            self.trial_num += 1
-        
-        
-        
-
         return None
 
     def build_state(self):
@@ -91,20 +73,8 @@ class LearningAgent(Agent):
         #   If it is not, create a dictionary in the Q-table for the current 'state'
         #   For each action, set the Q-value for the state-action pair to 0
         
-        # define states
-        state = ''
-        if inputs['light'] == 'green':
-            # if green light, we only care about the oncoming traffic. We can ignore others. 
-            state = ('green', inputs['oncoming'])
-        else:
-            # if red light, we only care about left car moving forward. We can ignore others. 
-            if inputs['left'] == 'forward':
-                state = ('red', 'left_forward')
-            else: 
-                state = ('red', 'else')
-        
-        # combine with the waypoint
-        state = (waypoint,) + state
+        # define state
+        state = (waypoint, inputs['light'], inputs['oncoming'], inputs['left'], inputs['right'])
         
         return state
 
@@ -166,10 +136,20 @@ class LearningAgent(Agent):
             if random.random() < self.epsilon:
                 # for epsilon possibility, explore. 
                 action = random.choice(self.valid_actions)
+                # record the number of random steps
+                self.random_steps += 1
             else:
-                action = max(self.Q[state], key=self.Q[state].get)
+                # get all actions which have highest q-values
+                actions = [k for k,v in self.Q[state].iteritems() if v == max(self.Q[state].values())]
+                # If there are many actions available, choose random except None
+                if len(actions) > 1 and None in actions:
+                    actions.remove(None)
+                    action = random.choice(actions)
+                else:
+                    action = actions[0]
+                # record the Q value based steps
+                self.q_steps += 1
         
- 
         return action
 
 
@@ -184,21 +164,17 @@ class LearningAgent(Agent):
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
         
-        # Subtract 1 from reward to punish agent for not following waypoint
-#         reward = reward -1
-        if self.env.t == 0:
-            # set the initial_deadline for the trial 
-            self.initial_deadline = float(self.env.get_deadline(self))
-            
-        self.alpha = 0.8 * float(self.env.t+1)**2 / self.initial_deadline**2
-        
-        
-        
         # update rule  
         self.Q[state][action] = \
-            (1-self.alpha) * self.Q[state][action] + self.alpha * (reward + self.get_maxQ(state))  
+            (1-self.alpha) * self.Q[state][action] + self.alpha * (reward)
             
-        
+        # print the number of steps taken 
+        # random steps
+        print "Random Steps taken: {0}".format(self.random_steps)
+        # Q value based steps
+        print "Q-value Steps taken: {0}".format(self.q_steps)
+        # Total steps taken
+        print "Total Steps taken: {0}".format(self.random_steps + self.q_steps)
 
         return
 
@@ -235,7 +211,7 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent, learning=True, alpha = 0.8, epsilon = 0.5)
+    agent = env.create_agent(LearningAgent, learning=True, alpha = 0.5, epsilon = 1)
     
     ##############
     # Follow the driving agent
@@ -257,7 +233,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(tolerance=0.01, n_test=30)
+    sim.run(tolerance=0.0, n_test=30)
 
 
 if __name__ == '__main__':
